@@ -1,0 +1,2 @@
+LD_LIBRARY_PATH=/user/jdeclerc/Analysis/EvtGen/EvtGen/external/HepMC/lib:/user/jdeclerc/Analysis/EvtGen/EvtGen/external/pythia8230/lib:/user/jdeclerc/Analysis/EvtGen/EvtGen/external/PHOTOS/lib:/user/jdeclerc/Analysis/EvtGen/EvtGen/external/TAUOLA/lib:/user/jdeclerc/Analysis/EvtGen/EvtGen/evtgen/lib:$LD_LIBRARY_PATH
+PYTHIA8DATA=/user/jdeclerc/Analysis/EvtGen/EvtGen/external/pythia8230/share/Pythia8/xmldoc
