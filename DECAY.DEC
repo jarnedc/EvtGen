@@ -9121,6 +9121,10 @@ Decay anti-Xi*+
 0.3330    anti-Xi+  pi0                     PHSP;
 Enddecay
 #
+Decay Xi(1820)
+1.0	Lambda0  anti-K0			            PHSP; #[PDG2017] 
+Enddecay 
+#
 Decay Omega-
 0.675949296 Lambda0 K-                                      PHSP; #[Reconstructed PDG2011]
 0.233949296 Xi0     pi-                                     PHSP; #[Reconstructed PDG2011]

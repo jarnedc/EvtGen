@@ -5,7 +5,7 @@ BASEDIR = ../
 # the external libraries are, as well as setting compiler flags etc..
 
 include ${BASEDIR}/config.mk
-include extraConfig.mk
+include ../validation/extraConfig.mk
 
 # Need to first add EvtGen libraries, then HepMC, then Photos, Tauola and Pythia,
 # since Photos depends on HepMC etc..                                            

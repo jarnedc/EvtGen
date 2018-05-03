@@ -547,4 +547,9 @@ add  p Particle  K(2)(1770)0                    10315  1.7730000e+00  1.8600000e
 add  p Particle  K(2)(1770)+                    10325  1.7730000e+00  1.8600000e-01  0.0000000e+00     3     8  1.0609000e-12          0
 add  p Particle  K(2)(1820)0                    20315  1.8160000e+00  2.7600000e-01  0.0000000e+00     0     8  7.1495000e-13          0
 add  p Particle  K(2)(1820)+                    20325  1.8160000e+00  2.7600000e-01  0.0000000e+00     3     8  7.1495000e-13          0
+*---------------------------------------------------------------------------------------------------------------------------------------
+* Added by J. De Clercq 2/5/2018 for CMS (from: http://pdg.lbl.gov/2017/tables/rpp2017-tab-baryons-Xi.pdf).The decay length is taken to be the one from
+*Xi_0 and max_dm (dm is the mass difference of the two mass eigenstates, http://evtgen.hepforge.org/doc/EvtGenGuide.pdf) is taken to be 0
+*---------------------------------------------------------------------------------------------------------------------------------------
+add  p Particle	 Xi(1820)		       103324  1.8230000e+00  2.400000e-02   0.0000000e+00     0     3   8.7100000e01           103324
 end
