@@ -30,6 +30,7 @@
 #include "TFile.h"
 #include "TApplication.h"
 #include "TROOT.h"
+#include "TMath.h"
 
 int main(int argc, char** argv) {
 
@@ -68,7 +69,7 @@ int main(int argc, char** argv) {
 
   static EvtId UPS4 = EvtPDL::getId(std::string("Upsilon(4S)"));
 */
-  int nEvents(100);
+  int nEvents(10000);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,13 +81,17 @@ int main(int argc, char** argv) {
    //myGenerator.readUDecay("exampleFiles/JPSITOLL.DEC");
    TFile *file=new TFile("Xi_1820.root", "RECREATE");
 
-   TH1F* coshel  = new TH1F("h1","cos hel",50,-1.0,1.0);
+   TH1F* h_delta_theta_Ks_l  = new TH1F("h_delta_theta_Ks_l","h_delta_theta_Ks_l",100,-TMath::Pi(),TMath::Pi());
+   TH1F* h_delta_phi_Ks_l  = new TH1F("h_delta_phi_Ks_l","h_delta_phi_Ks_l",100,-TMath::Pi(),TMath::Pi());
 
    count=1;
 
    do{
      std::cout << "Running for " << count  << std::endl;
-     EvtVector4R p_init(EvtPDL::getMass(Xi1820),0.0,0.0,0.0);
+     double p_x_Xi1820 = 2.; 
+     double p_y_Xi1820 = 0.; 
+     double p_z_Xi1820 = 0.; 
+     EvtVector4R p_init(sqrt(EvtPDL::getMass(Xi1820)*EvtPDL::getMass(Xi1820)+p_x_Xi1820*p_x_Xi1820+p_y_Xi1820*p_y_Xi1820+p_z_Xi1820*p_z_Xi1820),p_x_Xi1820,p_y_Xi1820,p_z_Xi1820);
      EvtParticle* root_part=EvtParticleFactory::particleFactory(Xi1820,
                                                                 p_init);
 
@@ -94,13 +99,36 @@ int main(int argc, char** argv) {
      myGenerator.generateDecay(root_part);
      EvtParticle *p = root_part;
 
+     // Write out the results
+     EvtHepMCEvent theEvent;
+     theEvent.constructEvent(root_part);
+     HepMC::GenEvent* genEvent = theEvent.getEvent();
+     genEvent->print(std::cout);
+
      do{
        if (p->getId()==Xi1820) {
          EvtVector4R p4Xi1820=p->getP4Lab();
          EvtVector4R p4Daug0=p->getDaug(0)->getP4Lab();
          EvtVector4R p4Daug1=p->getDaug(1)->getP4Lab();
-         double dcostheta=EvtDecayAngle(p_init,p4Xi1820,p4Daug0);
-         coshel->Fill(dcostheta);
+         //double dcostheta=EvtDecayAngle(p_init,p4Xi1820,p4Daug0);
+         double dcostheta=EvtDecayAngle(p_init,p4Daug0,p4Daug1);
+	 std::cout << "dcostheta: " << dcostheta << std::endl;
+
+	 double p_Xi1820 = sqrt(p4Xi1820.get(1)*p4Xi1820.get(1)+p4Xi1820.get(2)*p4Xi1820.get(2)+p4Xi1820.get(3)*p4Xi1820.get(3));
+	 double p_Daug0 = sqrt(p4Daug0.get(1)*p4Daug0.get(1)+p4Daug0.get(2)*p4Daug0.get(2)+p4Daug0.get(3)*p4Daug0.get(3));
+	 double p_Daug1 = sqrt(p4Daug1.get(1)*p4Daug1.get(1)+p4Daug1.get(2)*p4Daug1.get(2)+p4Daug1.get(3)*p4Daug1.get(3));
+
+	 double theta_Xi1820 = TMath::ACos(p4Xi1820.get(3)/p_Xi1820);
+	 double theta_Daug0 = TMath::ACos(p4Daug0.get(3)/p_Daug0);
+	 double theta_Daug1 = TMath::ACos(p4Daug1.get(3)/p_Daug1);
+
+	 double phi_Xi1820 = TMath::ATan(p4Xi1820.get(2)/p4Xi1820.get(1));
+	 double phi_Daug0 = TMath::ATan(p4Daug0.get(2)/p4Daug0.get(1));
+	 double phi_Daug1 = TMath::ATan(p4Daug1.get(2)/p4Daug1.get(1));
+
+	 h_delta_theta_Ks_l->Fill(theta_Daug0-theta_Daug1);
+	 h_delta_phi_Ks_l->Fill(phi_Daug0-phi_Daug1);
+
        }
        p=p->nextIter(root_part);
      }while(p!=0);
