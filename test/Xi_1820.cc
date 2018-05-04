@@ -69,12 +69,16 @@ int main(int argc, char** argv) {
 
   static EvtId UPS4 = EvtPDL::getId(std::string("Upsilon(4S)"));
 */
-  int nEvents(10000);
+  int nEvents(100000);
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
   static EvtId Xi1820=EvtPDL::getId(std::string("Xi(1820)"));
+  static EvtId K_S0=EvtPDL::getId(std::string("K0"));
+  static EvtId anti_K_S0=EvtPDL::getId(std::string("anti-K0"));
+  static EvtId Lambda0=EvtPDL::getId(std::string("Lambda0"));
+  static EvtId anti_Lambda0=EvtPDL::getId(std::string("anti-Lambda0"));
 
    int count;
   // myGenerator.readUDecay("exampleFiles/GENERIC.DEC");
@@ -83,6 +87,8 @@ int main(int argc, char** argv) {
 
    TH1F* h_delta_theta_Ks_l  = new TH1F("h_delta_theta_Ks_l","h_delta_theta_Ks_l",100,-TMath::Pi(),TMath::Pi());
    TH1F* h_delta_phi_Ks_l  = new TH1F("h_delta_phi_Ks_l","h_delta_phi_Ks_l",100,-TMath::Pi(),TMath::Pi());
+   TH1F* h_delta_eta_Ks_l  = new TH1F("h_delta_eta_Ks_l","h_delta_eta_Ks_l",100,-TMath::Pi(),TMath::Pi());
+   TH1F* h_delta_R_Ks_l  = new TH1F("h_delta_R_Ks_l","h_delta_R_Ks_l",200,0,10);
 
    count=1;
 
@@ -107,6 +113,8 @@ int main(int argc, char** argv) {
 
      do{
        if (p->getId()==Xi1820) {
+	 if(p->getDaug(0)->getId()!=K_S0 and p->getDaug(0)->getId()!=anti_K_S0 and p->getDaug(0)->getId()!=Lambda0 and p->getDaug(0)->getId()!= anti_Lambda0 ) continue;
+	 if(p->getDaug(1)->getId()!=K_S0 and p->getDaug(1)->getId()!=anti_K_S0 and p->getDaug(1)->getId()!=Lambda0 and p->getDaug(1)->getId()!= anti_Lambda0 ) continue;
          EvtVector4R p4Xi1820=p->getP4Lab();
          EvtVector4R p4Daug0=p->getDaug(0)->getP4Lab();
          EvtVector4R p4Daug1=p->getDaug(1)->getP4Lab();
@@ -122,19 +130,43 @@ int main(int argc, char** argv) {
 	 double theta_Daug0 = TMath::ACos(p4Daug0.get(3)/p_Daug0);
 	 double theta_Daug1 = TMath::ACos(p4Daug1.get(3)/p_Daug1);
 
+	 double eta_Xi1820 = -TMath::Log(TMath::Tan(theta_Xi1820/2.));
+	 double eta_Daug0 = -TMath::Log(TMath::Tan(theta_Daug0/2.));
+	 double eta_Daug1 = -TMath::Log(TMath::Tan(theta_Daug1/2.));
+	 
 	 double phi_Xi1820 = TMath::ATan(p4Xi1820.get(2)/p4Xi1820.get(1));
 	 double phi_Daug0 = TMath::ATan(p4Daug0.get(2)/p4Daug0.get(1));
 	 double phi_Daug1 = TMath::ATan(p4Daug1.get(2)/p4Daug1.get(1));
+	 
+	 double d_phi_Daug = phi_Daug0-phi_Daug1;
+         double d_eta_Daug = eta_Daug0-eta_Daug1;
+	 double dR = sqrt(d_phi_Daug*d_phi_Daug+d_eta_Daug*d_eta_Daug);
 
 	 h_delta_theta_Ks_l->Fill(theta_Daug0-theta_Daug1);
-	 h_delta_phi_Ks_l->Fill(phi_Daug0-phi_Daug1);
-
+	 h_delta_phi_Ks_l->Fill(d_phi_Daug);
+	 h_delta_eta_Ks_l->Fill(d_eta_Daug);
+	 h_delta_R_Ks_l->Fill(dR);
+	 count++;
        }
        p=p->nextIter(root_part);
      }while(p!=0);
 
      root_part->deleteTree();
-   }while (count++<nEvents);
+   }while (count<nEvents);
+   
+   Double_t norm = h_delta_phi_Ks_l->GetEntries();
+   if(norm) h_delta_phi_Ks_l->Scale(1/norm);
+    
+   Double_t norm2 = h_delta_theta_Ks_l->GetEntries();
+   if(norm2) h_delta_theta_Ks_l->Scale(1/norm2);
+   
+   Double_t norm3 = h_delta_eta_Ks_l->GetEntries();
+   if(norm) h_delta_eta_Ks_l->Scale(1/norm3);
+    
+   Double_t norm4 = h_delta_R_Ks_l->GetEntries();
+   if(norm2) h_delta_R_Ks_l->Scale(1/norm4);
+
+
    file->Write(); file->Close();
 
    EvtGenReport(EVTGEN_INFO,"EvtGen") << "SUCCESS\n";
